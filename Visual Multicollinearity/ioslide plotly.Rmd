@@ -1,0 +1,134 @@
+---
+title: "Interactive plots"
+author: "FRK"
+date: "April 20, 2018"
+output: ioslides_presentation
+---
+
+# Code
+
+
+## With Multicollinearity
+
+```{r}
+# FRK
+# I have used matrix method, you may use lm function
+
+
+# Generate X
+x1 <- runif(20,0,1)
+x2 <- 0.5*x1 + rnorm(20,0, 0.015)
+
+# In matrix form
+# data matrix with first column for intercept
+X <- matrix(c(rep(1,times=20), x1, x2), ncol=3)
+
+# 10000 loops
+bo <- b1 <- b2 <- NULL
+
+y1 <- matrix(rnorm(200), nrow=20, ncol=10)
+
+```
+
+##
+
+```{r}
+for(i in 1:10){
+  y <- 0.5 + 1.5 * x1 - 2 * x2 + rnorm(20, 0, 1) # Error
+  Y <- matrix(y, ncol=1)
+  beta <- solve( t(X) %*% X ) %*% t(X) %*% Y
+  bo[i] <- beta[1,1]
+  b1[i] <- beta[2,1]
+  b2[i] <- beta[3,1]
+  
+  for(j in 1:20){
+    y1 [j, i] <- bo[i] + b1[i]*x1[j] + b2[i]*x2[j]
+  }
+  
+}
+
+```
+
+##
+```{r}
+
+y1 <- c(y1[,1], y1[,2], y1[,3], y1[,4], y1[,5], 
+        y1[,6], y1[,7], y1[,8], y1[,9], y1[,10] )
+x1 <- rep(x1, times=10)
+x2 <- rep(x2, times=10)
+
+dat <- data.frame(x1, x2, y1)
+library(plotly)
+p1 <- plot_ly(dat, x = ~x1, y = ~x2, z = ~y1)
+
+
+
+
+```
+
+## WithOUT Multicollinearity
+
+
+```{r}
+
+# Generate X
+x1 <- runif(20,0,1)
+x2 <- rnorm(20,0,15)
+
+# In matrix form
+# data matrix with first column for intercept
+X <- matrix(c(rep(1,times=20), x1, x2), ncol=3)
+
+# 10000 loops
+bo <- b1 <- b2 <- NULL
+
+y1 <- matrix(rnorm(200), nrow=20, ncol=10)
+```
+##
+```{r}
+for(i in 1:10){
+  y <- 0.5 + 1.5 * x1 - 2 * x2 + rnorm(20, 0, 1) # Error
+  Y <- matrix(y, ncol=1)
+  beta <- solve( t(X) %*% X ) %*% t(X) %*% Y
+  bo[i] <- beta[1,1]
+  b1[i] <- beta[2,1]
+  b2[i] <- beta[3,1]
+  
+  for(j in 1:20){
+    y1 [j, i] <- bo[i] + b1[i]*x1[j] + b2[i]*x2[j]
+  }
+  
+}
+```
+##
+```{r}
+
+y1 <- c(y1[,1], y1[,2], y1[,3], y1[,4], y1[,5], 
+        y1[,6], y1[,7], y1[,8], y1[,9], y1[,10] )
+x1 <- rep(x1, times=10)
+x2 <- rep(x2, times=10)
+
+dat <- data.frame(x1, x2, y1)
+library(plotly)
+p2 <- plot_ly(dat, x = ~x1, y = ~x2, z = ~y1)
+
+```
+
+# PLots
+
+## With Multicollinearity
+
+```{r, warning=FALSE, message=FALSE}
+
+p1
+
+```
+
+
+## Without Multicollinearity
+
+```{r, warning=FALSE, message=FALSE}
+p2
+
+```
+
